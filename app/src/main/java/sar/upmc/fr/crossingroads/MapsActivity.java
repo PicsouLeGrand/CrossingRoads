@@ -1,23 +1,27 @@
 package sar.upmc.fr.crossingroads;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -31,6 +35,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Location loc;
     private LocationCallback mLocationCallback;
     private boolean mRequestingLocationUpdates = true;
+    //Buttons
+    private FloatingActionButton buttonProfil;
+    private FloatingActionButton buttonScores;
+    //Music Player
+    MediaPlayer mediaPlayer;
 
 
     @Override
@@ -44,6 +53,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         getLastKnownLocation();
+
+        //Media Player
+        mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.thearrival);
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.start();
+                mp.setLooping(true);
+            }
+        });
+
+        //Buttons
+        buttonProfil = findViewById(R.id.button);
+        buttonScores = findViewById(R.id.button2);
+        //Buttons Listeners
+        buttonProfil.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), ProfileActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        buttonScores.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), ScoresActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void getLastKnownLocation() {
@@ -51,7 +90,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0  );
         }
         mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
             @Override
@@ -60,7 +99,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Location location = task.getResult();
                     loc = location;
                     Log.d("tag", "onComplete called " + loc.getLongitude());
-                    mMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())).title("Marker in Sydney"));
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())).title("Marker in Sydney")
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.eiffel_tower)));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(loc.getLatitude(), loc.getLongitude())));
                 }
             }
@@ -84,5 +124,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
+        //TODO Gerer pour que la musique reprenne onResume
+//        mediaPlayer.reset();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+//        mediaPlayer.stop();
+//        mediaPlayer.release();
     }
 }

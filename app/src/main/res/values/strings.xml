@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">CrossingRoads</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_game">Game</string>
+    <string name="title_activity_profile">Profile</string>
+    <string name="title_activity_scores">Scores</string>
 </resources>
