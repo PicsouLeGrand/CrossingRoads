@@ -1,26 +1,34 @@
 package sar.upmc.fr.crossingroads;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.PersistableBundle;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    public static String BUNDLE_NAME_USER = "";
-    public static String BUNDLE_MOTO_USER = "";
+    private static String BUNDLE_NAME_USER = "";
+    private static String BUNDLE_MOTTO_USER = "";
+    private static Drawable BUNDLE_IMAGE_USER = null;
+    public static final int GET_FROM_GALLERY = 3;
 
     private EditText editName;
     private EditText editMoto;
     private FloatingActionButton saveButton;
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,21 +42,43 @@ public class ProfileActivity extends AppCompatActivity {
         editName = findViewById(R.id.editText1);
         editMoto = findViewById(R.id.editText2);
         saveButton = findViewById(R.id.saveButton);
+        imageView = findViewById(R.id.imageView);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 BUNDLE_NAME_USER = editName.getText().toString();
-                BUNDLE_MOTO_USER = editMoto.getText().toString();
+                BUNDLE_MOTTO_USER = editMoto.getText().toString();
+                BUNDLE_IMAGE_USER = imageView.getDrawable();
                 //Log.d("kk", "username " + BUNDLE_NAME_USER);
                 Toast.makeText(getApplicationContext(),"Saved successfully", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI), GET_FROM_GALLERY);
             }
         });
     }
 
     @Override
-    public View onCreateView(String name, Context context, AttributeSet attrs) {
-        return super.onCreateView(name, context, attrs);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //Detects request codes
+        if(requestCode == GET_FROM_GALLERY && resultCode == Activity.RESULT_OK) {
+            Uri selectedImage = data.getData();
+            Bitmap bitmap;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+                imageView.setImageBitmap(bitmap);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -58,10 +88,22 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
         editName.setText(BUNDLE_NAME_USER);
-        editMoto.setText(BUNDLE_MOTO_USER);
+        editMoto.setText(BUNDLE_MOTTO_USER);
+        if(BUNDLE_IMAGE_USER != null)
+            imageView.setImageDrawable(BUNDLE_IMAGE_USER);
     }
 }

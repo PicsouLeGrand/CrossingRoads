@@ -11,8 +11,8 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="104dp"
-        android:layout_height="107dp"
+        android:layout_width="178dp"
+        android:layout_height="143dp"
         android:layout_marginStart="245dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="245dp"
@@ -48,7 +48,7 @@
         android:layout_marginTop="28dp"
         android:layout_marginEnd="372dp"
         android:ems="10"
-        android:hint="Moto"
+        android:hint="Motto"
         android:inputType="textPersonName"
         android:textAlignment="center"
         android:backgroundTint="@color/black"

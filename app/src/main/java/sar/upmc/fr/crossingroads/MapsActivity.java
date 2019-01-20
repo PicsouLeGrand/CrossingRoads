@@ -1,11 +1,14 @@
 package sar.upmc.fr.crossingroads;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -125,13 +128,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onResume() {
         super.onResume();
         //TODO Gerer pour que la musique reprenne onResume
-//        mediaPlayer.reset();
+        mediaPlayer.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-//        mediaPlayer.stop();
-//        mediaPlayer.release();
+        //mediaPlayer.pause();
+        //mediaPlayer.release();
     }
 }
