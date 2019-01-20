@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -58,14 +60,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         getLastKnownLocation();
 
         //Media Player
-        mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.thearrival);
-        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.start();
-                mp.setLooping(true);
-            }
-        });
+        Intent svc = new Intent(this, BackgroundSoundService.class);
+        startService(svc);
 
         //Buttons
         buttonProfil = findViewById(R.id.button);
@@ -102,8 +98,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Location location = task.getResult();
                     loc = location;
                     Log.d("tag", "onComplete called " + loc.getLongitude());
-                    mMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())).title("Marker in Sydney")
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.eiffel_tower)));
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())).title("You are here"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(loc.getLatitude(), loc.getLongitude())));
                 }
             }
@@ -122,13 +117,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        mMap.addMarker(new MarkerOptions().position(new LatLng(-33.867487, 151.206990))).setIcon(BitmapDescriptorFactory.fromBitmap(resizeBitmap(R.drawable.sydney_icon)));
+        mMap.addMarker(new MarkerOptions().position(new LatLng(48.856614, 2.352222))).setIcon(BitmapDescriptorFactory.fromBitmap(resizeBitmap(R.drawable.paris_icon)));
+        mMap.addMarker(new MarkerOptions().position(new LatLng(40.712784, -74.005941))).setIcon(BitmapDescriptorFactory.fromBitmap(resizeBitmap(R.drawable.newyork_icon)));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         //TODO Gerer pour que la musique reprenne onResume
-        mediaPlayer.start();
+//        mediaPlayer.start();
     }
 
     @Override
@@ -136,5 +135,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onPause();
         //mediaPlayer.pause();
         //mediaPlayer.release();
+    }
+
+    protected Bitmap resizeBitmap(int icon) {
+        int height = 180;
+        int width = 180;
+        BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(icon, null);
+        Bitmap b=bitmapdraw.getBitmap();
+        Bitmap marker = Bitmap.createScaledBitmap(b, width, height, false);
+        return marker;
     }
 }
