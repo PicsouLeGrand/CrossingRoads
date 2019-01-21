@@ -17,6 +17,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -28,24 +29,22 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationClient;
-    private LocationRequest mLocationRequest;
     private Location loc;
-    private LocationCallback mLocationCallback;
-    private boolean mRequestingLocationUpdates = true;
+
     //Buttons
     private FloatingActionButton buttonProfil;
     private FloatingActionButton buttonScores;
-    //Music Player
-    MediaPlayer mediaPlayer;
-
+    //Markers
+//    private Marker paris, newyork, sydney;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,10 +95,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onComplete(@NonNull Task<Location> task) {
                 if(task.isSuccessful()) {
                     Location location = task.getResult();
-                    loc = location;
-                    Log.d("tag", "onComplete called " + loc.getLongitude());
-                    mMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())).title("You are here"));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(loc.getLatitude(), loc.getLongitude())));
+                    if(location != null) {
+                        loc = location;
+                        //Log.d("tag", "onComplete called " + loc.getLongitude());
+                        mMap.addMarker(new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude())).title("You are here"));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(loc.getLatitude(), loc.getLongitude())));
+                    }
                 }
             }
         });
@@ -117,10 +118,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMarkerClickListener(this);
+        mMap.addMarker(new MarkerOptions().title("Sydney").position(new LatLng(-33.867487, 151.206990))).setIcon(BitmapDescriptorFactory.fromBitmap(resizeBitmap(R.drawable.sydney_icon)));
+        mMap.addMarker(new MarkerOptions().title("Paris").position(new LatLng(48.856614, 2.352222))).setIcon(BitmapDescriptorFactory.fromBitmap(resizeBitmap(R.drawable.paris_icon)));
+        mMap.addMarker(new MarkerOptions().title("New York").position(new LatLng(40.712784, -74.005941))).setIcon(BitmapDescriptorFactory.fromBitmap(resizeBitmap(R.drawable.newyork_icon)));
+    }
 
-        mMap.addMarker(new MarkerOptions().position(new LatLng(-33.867487, 151.206990))).setIcon(BitmapDescriptorFactory.fromBitmap(resizeBitmap(R.drawable.sydney_icon)));
-        mMap.addMarker(new MarkerOptions().position(new LatLng(48.856614, 2.352222))).setIcon(BitmapDescriptorFactory.fromBitmap(resizeBitmap(R.drawable.paris_icon)));
-        mMap.addMarker(new MarkerOptions().position(new LatLng(40.712784, -74.005941))).setIcon(BitmapDescriptorFactory.fromBitmap(resizeBitmap(R.drawable.newyork_icon)));
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Intent intent = new Intent(this, GameActivity.class);
+        startActivity(intent);
+        return false;
     }
 
     @Override

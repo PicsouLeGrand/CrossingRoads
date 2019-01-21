@@ -6,8 +6,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import java.util.List;
-
 public class ScoresActivity extends AppCompatActivity {
 
     private TextView textView;
